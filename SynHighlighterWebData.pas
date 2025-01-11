@@ -76,8 +76,8 @@ uses
 type
 {$IFDEF UNISYNEDIT}
   TSynWebString = UnicodeString;
-  TSynWebStrings = TUnicodeStrings;
-  TSynWebStringList = TUnicodeStringList;
+  TSynWebStrings = TStrings;
+  TSynWebStringList = TStringList;
 {$ELSE}
   TSynWebString = String;
   TSynWebStrings = TStrings;

@@ -627,13 +627,13 @@ var
     end;
   end;
 
-  procedure AddSimple(AInsert: String; AKind: String = ''; AKindColor: TColor = clBlack);
+  procedure AddSimple(AInsert: String; AKind: String = ''; AKindColor: TColor = clWindowText);
   var
     c: String;
   begin
     c := ColorToString(AKindColor);
     if AKind <> '' then
-      ACompletion.ItemList.Add(Format('\color{%s}%s\column{}\color{clBlack}\style{+B}%s',[c, AKind, AInsert]))
+      ACompletion.ItemList.Add(Format('\color{%s}%s\column{}\color{clWindowText}\style{+B}%s',[c, AKind, AInsert]))
     else
       ACompletion.ItemList.Add(AInsert);
     ACompletion.InsertList.Add(AInsert);
@@ -1267,7 +1267,7 @@ var
   function DoLowerStr(const AStr: TSynWebString): TSynWebString;
   begin
     {$IFDEF UNISYNEDIT}
-    Result := SynUnicode.SynWideLowerCase(AStr);
+    Result := SysUtils.AnsiLowerCase(AStr);
     {$ELSE}
     Result := LowerCase(AStr);
     {$ENDIF}
@@ -1322,7 +1322,7 @@ begin
   lDisplay.Row := FirstLine;
 
   if Editor.Gutter.Visible then
-    lMarginLeft := Editor.Gutter.RealGutterWidth(Editor.CharWidth) - 2
+    lMarginLeft := Editor.Gutter.RealGutterWidth - 2
   else
     lMarginLeft := 2;
 
@@ -1481,12 +1481,7 @@ begin
   swwpFillRect:
     begin
       ACanvas.Font.Color := FFGColor;
-
-{$IFDEF UNISYNEDIT}
-      ExtTextOutW(ACanvas.Handle, ARect.Left, ARect.Top, 0, @ARect, PWideChar(AText), Length(AText), nil);
-{$ELSE} 
-      ACanvas.TextRect(ARect, ARect.Left, ARect.Top, AText);
-{$ENDIF}
+      ACanvas.TextRect(ARect, ARect.Left, ARect.Top, AText)
     end;
 
   swwpFrameRect:

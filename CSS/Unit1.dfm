@@ -320,6 +320,7 @@ object Form1: TForm1
     Caption = 'Button15'
     Enabled = False
     TabOrder = 24
+    Visible = False
     OnClick = Button15Click
   end
   object CheckBox3: TCheckBox

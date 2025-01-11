@@ -33,9 +33,9 @@ requires
   rtl;
 
 contains
-  SynHighlighterWeb in '..\Source\SynHighlighterWeb.pas',
-  SynHighlighterWebData in '..\Source\SynHighlighterWebData.pas',
-  SynHighlighterWebMisc in '..\Source\SynHighlighterWebMisc.pas',
-  SynTokenMatch in '..\Source\SynTokenMatch.pas';
+  SynHighlighterWeb,
+  SynHighlighterWebData,
+  SynHighlighterWebMisc,
+  SynTokenMatch;
 
 end.

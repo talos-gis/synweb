@@ -66,32 +66,18 @@ Known limitations:
 The SynHighlighterWeb unit provides SynEdit with a Multi Html/XHtml/Wml/Xml/Xslt/Css/ECMAScript/Php highlighter.
 }
 
-{$IFNDEF QSYNHIGHLIGHTERWEB}
 unit SynHighlighterWeb;
-{$ENDIF}
 
 {$I SynWeb.inc}
 
 interface
 
 uses
-{$IFDEF SYN_CLX}
-  QGraphics,
-{$IFDEF UNISYNEDIT}
-  QSynUnicode,
-{$ENDIF}
-  QSynEditTypes,
-  QSynEditHighlighter,
-  QSynHighlighterWebData,
-{$ELSE}
   Graphics,
-{$IFDEF UNISYNEDIT}
   SynUnicode,
-{$ENDIF}
   SynEditTypes,
   SynEditHighlighter,
   SynHighlighterWebData,
-{$ENDIF}
   Classes,
   SysUtils;
 
@@ -407,6 +393,7 @@ type
     function GetSampleSource: String; override;
 {$ENDIF}
   public
+    procedure Assign(Source: TPersistent); override;
 {$IFDEF UNISYNEDIT}
     class function GetFriendlyLanguageName: UnicodeString; override;
     class function SynWebSample: UnicodeString; virtual; abstract;
@@ -490,6 +477,7 @@ type
   public
     class function GetLanguageName: string; override;
 {$IFDEF UNISYNEDIT}
+    class function GetFriendlyLanguageName: UnicodeString; override;
     class function SynWebSample: UnicodeString; override;
 {$ELSE}
     class function SynWebSample: String; override;
@@ -574,6 +562,7 @@ type
   public
     class function GetLanguageName: string; override;
 {$IFDEF UNISYNEDIT}
+    class function GetFriendlyLanguageName: UnicodeString; override;
     class function SynWebSample: UnicodeString; override;
 {$ELSE}
     class function SynWebSample: String; override;
@@ -596,6 +585,7 @@ type
   public
     class function GetLanguageName: string; override;
 {$IFDEF UNISYNEDIT}
+    class function GetFriendlyLanguageName: UnicodeString; override;
     class function SynWebSample: UnicodeString; override;
 {$ELSE}
     class function SynWebSample: String; override;
@@ -619,6 +609,7 @@ type
   public
     class function GetLanguageName: string; override;
 {$IFDEF UNISYNEDIT}
+    class function GetFriendlyLanguageName: UnicodeString; override;
     class function SynWebSample: UnicodeString; override;
 {$ELSE}
     class function SynWebSample: String; override;
@@ -665,6 +656,7 @@ type
   public
     class function GetLanguageName: string; override;
 {$IFDEF UNISYNEDIT}
+    class function GetFriendlyLanguageName: UnicodeString; override;
     class function SynWebSample: UnicodeString; override;
 {$ELSE}
     class function SynWebSample: String; override;
@@ -1197,15 +1189,11 @@ type
 implementation
 
 uses
-{$IFDEF SYN_COMPILER_12_UP}
   AnsiStrings,
-{$ENDIF}
-
-{$IFDEF SYN_CLX}
-  QSynEditStrConst, StrUtils;
-{$ELSE}
-  SynEditStrConst, StrUtils, Controls;
-{$ENDIF}
+  Types,
+  SynEditStrConst,
+  StrUtils,
+  Controls;
 
 { TSynWebOptionsBase }
 
@@ -1578,6 +1566,16 @@ begin
 end;
 
 { TSynWebBase }
+
+procedure TSynWebBase.Assign(Source: TPersistent);
+begin
+  if (Source <> nil) and (Source is TSynWebBase) then begin
+    Engine := TSynWebBase(Source).Engine;
+    fOptions.Assign(TSynWebBase(Source).fOptions);
+  end;
+
+  inherited;
+end;
 
 constructor TSynWebBase.Create(AOwner: TComponent);
 begin
@@ -2034,6 +2032,11 @@ begin
 end;
 
 {$IFDEF UNISYNEDIT}
+class function TSynWebHtmlSyn.GetFriendlyLanguageName: UnicodeString;
+begin
+  Result := SYNS_FriendlyLangHTML;
+end;
+
 class function TSynWebHtmlSyn.SynWebSample: UnicodeString;
 {$ELSE}
 class function TSynWebHtmlSyn.SynWebSample: String;
@@ -2281,12 +2284,38 @@ begin
 end;
 
 {$IFDEF UNISYNEDIT}
+class function TSynWebXmlSyn.GetFriendlyLanguageName: UnicodeString;
+begin
+  Result := SYNS_FriendlyLangXML;
+end;
+
 class function TSynWebXmlSyn.SynWebSample: UnicodeString;
 {$ELSE}
 class function TSynWebXmlSyn.SynWebSample: String;
 {$ENDIF}
 begin
-  Result := ''; // todo: XML Sample
+  Result := 
+    '<?xml version="1.0"?>'#13#10 +
+    '<?xml-stylesheet type="text/css" href="nutrition.css"?>'#13#10 +
+    '<nutrition>'#13#10 +
+    #13#10 +
+    '<dailyvalues>'#13#10 +
+    '	<totalfat units="g">65</totalfat>'#13#10 +
+    '	<saturatedfat units="g">20</saturatedfat>'#13#10 +
+    '	<cholesterol units="mg">300</cholesterol>'#13#10 +
+    '	<sodium units="mg">2400</sodium>'#13#10 +
+    '	<carb units="g">300</carb>'#13#10 +
+    '	<fiber units="g">25</fiber>'#13#10 +
+    '	<protein units="g">50</protein>'#13#10 +
+    '</dailyvalues>'#13#10 +
+    #13#10+
+    #13#10+
+    '<!--'#13#10 +
+    '<food>'#13#10 +
+    '	<serving units="g"></serving>'#13#10 +
+    '	<calories total="" fat=""/>'#13#10 +
+    '</food>'#13#10 +
+    '-->';
 end;
 
 { TSynWebCssSyn }
@@ -2322,6 +2351,11 @@ begin
 end;
 
 {$IFDEF UNISYNEDIT}
+class function TSynWebCssSyn.GetFriendlyLanguageName: UnicodeString;
+begin
+  Result := 'CSS';
+end;
+
 class function TSynWebCssSyn.SynWebSample: UnicodeString;
 {$ELSE}
 class function TSynWebCssSyn.SynWebSample: String;
@@ -2383,6 +2417,11 @@ begin
 end;
 
 {$IFDEF UNISYNEDIT}
+class function TSynWebEsSyn.GetFriendlyLanguageName: UnicodeString;
+begin
+  Result := SYNS_FriendlyLangJScript;
+end;
+
 class function TSynWebEsSyn.SynWebSample: UnicodeString;
 {$ELSE}
 class function TSynWebEsSyn.SynWebSample: String;
@@ -2487,6 +2526,11 @@ begin
 end;
 
 {$IFDEF UNISYNEDIT}
+class function TSynWebPhpPlainSyn.GetFriendlyLanguageName: UnicodeString;
+begin
+  Result := SYNS_FriendlyLangPHP;
+end;
+
 class function TSynWebPhpPlainSyn.SynWebSample: UnicodeString;
 {$ELSE}
 class function TSynWebPhpPlainSyn.SynWebSample: String;
@@ -3809,7 +3853,7 @@ begin
       else
         FInstance^.FTokenID := stkMLTagKeyValue;
       if GetRangeBit(27) then
-        SetRangeBit(28, UpperCase(GetToken) = 'PHP');
+        SetRangeBit(28, AnsiStrings.UpperCase(GetToken) = 'PHP');
       MLSetRange(srsMLTagKey);
     end;
   end;
@@ -3843,7 +3887,7 @@ begin
         Inc(FInstance^.FRun);
         FInstance^.FTokenID := stkMLTagKeyValueQuoted;
         if GetRangeBit(27) then
-          SetRangeBit(28, UpperCase(GetToken) = #39'PHP'#39);
+          SetRangeBit(28, AnsiStrings.UpperCase(GetToken) = #39'PHP'#39);
         Break;
       end;
     end;
@@ -3881,7 +3925,7 @@ begin
         Inc(FInstance^.FRun);
         FInstance^.FTokenID := stkMLTagKeyValueQuoted;
         if GetRangeBit(27) then
-          SetRangeBit(28, UpperCase(GetToken) = '"PHP"');
+          SetRangeBit(28, AnsiStrings.UpperCase(GetToken) = '"PHP"');
         Break;
       end;
     end;
@@ -5636,7 +5680,7 @@ procedure TSynWebEngine.CssRangePropValRgbProc;
       if FInstance^.FOptions.FCssVersion = scvCss3 then
         FInstance^.FTokenID := stkCssValNumber
       else
-        FInstance^.FTokenID := stkCssError;
+      FInstance^.FTokenID := stkCssError;
     end;
   end;
 
@@ -9051,10 +9095,14 @@ var
 begin
   i := $FFFFFFFF shl ALen;
   //todo: Does it work in CLX? Should be [EBX].APos? I don't know :(
+  {$IFDEF CPUX64}
+  i:= (i shl APos) or (i shr (32-APos));
+  {$ELSE}
   asm
     mov ecx, APos
     rol i, cl
   end;
+  {$ENDIF}
   FInstance^.FRange := (FInstance^.FRange and i) or ((AVal shl APos) and not i);
 end;
 
